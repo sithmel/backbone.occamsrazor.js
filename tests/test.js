@@ -1,6 +1,3 @@
-/*
-Build a very simple infrastructure
-*/
 
 
 /*
@@ -8,6 +5,7 @@ Build a very simple infrastructure
 */
 module("Heterogeneous collection", {
     setup: function (){
+        while (localStorage.length) localStorage.removeItem(localStorage.key(0));
 
         /*
         validators
@@ -65,7 +63,7 @@ module("Heterogeneous collection", {
         this.Circle = Backbone.Model.extend({
             getArea: function (){
                 var r = this.get('radius');
-                return Math.PI * r * r;
+                return Math.round(Math.PI * r * r);
             }
         });
 
@@ -90,46 +88,10 @@ module("Heterogeneous collection", {
         this.shapesCollection.add([this.rect, this.square, this.circle]);
 
 
-        /*
-        collection view
-        */
-
-        this.shapesView = new Backbone.Occamsrazor.CollectionView({collection: this.shapesCollection, el: $('#fixture')});
-
-        /*
-        add 3 kind of "item view" to the collection view
-        */
-
-
-        this.shapesView.itemView.addConstructor([null, hasRadius], Backbone.Occamsrazor.ItemView.extend({
-            tagName:  'div',
-            render: function (){
-                this.$el.html('The area of the circle is ' + this.model.getArea());
-                return this;
-                
-            }
-        }));
-
-        this.shapesView.itemView.addConstructor([null, hasWidthHeight], Backbone.Occamsrazor.ItemView.extend({
-            tagName:  'div',
-            render: function (){
-                this.$el.html('The area of the square is ' + this.model.getArea());
-                return this;
-            }
-        }));
-
-        this.shapesView.itemView.addConstructor([null, hasWidth], Backbone.Occamsrazor.ItemView.extend({
-            tagName:  'div',
-            render: function (){
-                this.$el.html('The area of the rectangle is ' + this.model.getArea());
-                return this;
-            }
-        }));
-
     },
     teardown: function (){
         // empty localstorage
-        while (localStorage.length) localStorage.removeItem(localStorage.key(0));
+//        while (localStorage.length) localStorage.removeItem(localStorage.key(0));
     }
 });
 
@@ -153,11 +115,223 @@ test("Test save and retrieve model collection", function() {
     ok(this.shapesCollection.at(2) instanceof this.Circle,'shape 3 is a circle');
 });
 
-test("Test view", function() {
+
+module("Heterogeneous views", {
+    setup: function (){
+
+        // remove fixtures
+
+        $('#fixture').empty();
+
+        /*
+        validators
+        */
+
+        var hasWidth = function (obj){
+                if (obj instanceof Backbone.Model){
+                    return obj.has('width');
+                }
+                return 'width' in obj;
+            },
+            hasRadius = function (obj){
+                if (obj instanceof Backbone.Model){
+                    return obj.has('radius');
+                }
+                return 'radius' in obj;
+            };
+
+        /*
+        models
+        */
+
+        this.Square = Backbone.Model.extend({
+            getArea: function (){
+                var w = this.get('width');
+                return w*w;
+            }
+        });
+
+        this.Circle = Backbone.Model.extend({
+            getArea: function (){
+                var r = this.get('radius');
+                return Math.round(Math.PI * r * r);
+            }
+        });
+
+        this.square = {width: 10};
+        this.circle = {radius: 3};
+
+        this.model = occamsrazor()
+            .addConstructor(hasWidth, this.Square)
+            .addConstructor(hasRadius, this.Circle);
+
+
+        this.view =  occamsrazor()
+            .addConstructor([null, hasRadius], Backbone.Occamsrazor.ItemView.extend({
+                tagName:  'div',
+                render: function (){
+                    this.$el.html('The area of the circle is ' + this.model.getArea());
+                    return this;
+                    
+                }
+            }))
+            .addConstructor([null, hasWidth], Backbone.Occamsrazor.ItemView.extend({
+                tagName:  'div',
+                render: function (){
+                    this.$el.html('The area of the square is ' + this.model.getArea());
+                    return this;
+                }
+            }));
+    },
+    teardown: function (){
+    }
+});
+
+test("test square view", function() {
+    var square = new this.model(this.square);
+ 
+    ok(square instanceof this.Square, 'it is the right model');
+
+    var view = this.view({}, square);
+
+    view.render();
+
+    $('#fixture').append(view.el);
+
+    equals($('#fixture').html(), '<div>The area of the square is 100</div>', 'it is the right view')
+});
+
+test("test circle view", function() {
+    var circle = new this.model(this.circle);
+ 
+    ok(circle instanceof this.Circle, 'it is the right model');
+
+    var view = this.view({}, circle);
+
+    view.render();
+
+    $('#fixture').append(view.el);
+    equals($('#fixture').html(), '<div>The area of the circle is 28</div>', 'it is the right view')
+});
+
+module("Heterogeneous collection view", {
+    setup: function (){
+
+        // remove fixtures
+
+        $('#fixture').empty();
+
+        /*
+        validators
+        */
+
+        var hasWidth = function (obj){
+                if (obj instanceof Backbone.Model){
+                    return obj.has('width');
+                }
+                return 'width' in obj;
+            },
+            hasRadius = function (obj){
+                if (obj instanceof Backbone.Model){
+                    return obj.has('radius');
+                }
+                return 'radius' in obj;
+            };
+
+        /*
+        collection
+        */
+
+        this.ShapesCollection = Backbone.Occamsrazor.Collection.extend({
+        });
+
+        this.shapesCollection = new this.ShapesCollection;
+
+        /*
+        models
+        */
+
+        this.Square = Backbone.Model.extend({
+            getArea: function (){
+                var w = this.get('width');
+                return w*w;
+            }
+        });
+
+        this.Circle = Backbone.Model.extend({
+            getArea: function (){
+                var r = this.get('radius');
+                return Math.round(Math.PI * r * r);
+            }
+        });
+
+        this.square = {width: 10};
+        this.circle = {radius: 3};
+
+        /*
+        add 3 kind of models to the collection
+        */
+
+        this.shapesCollection.model.addConstructor(hasWidth, this.Square);
+        this.shapesCollection.model.addConstructor(hasRadius, this.Circle);
+
+
+        /*
+        add 3 objects to the collection
+        */
+
+//        this.shapesCollection.add([this.rect, this.square, this.circle]);
+
+
+        /*
+        collection view
+        */
+
+        this.shapesView = new Backbone.Occamsrazor.CollectionView({collection: this.shapesCollection, el: $('#fixture')});
+
+        /*
+        add 2 kind of "item view" to the collection view
+        */
+
+        this.shapesView.itemView.addConstructor([null, hasRadius], Backbone.Occamsrazor.ItemView.extend({
+            tagName:  'div',
+            render: function (){
+                this.$el.html('The area of the circle is ' + this.model.getArea());
+                return this;
+                
+            }
+        }));
+
+        this.shapesView.itemView.addConstructor([null, hasWidth], Backbone.Occamsrazor.ItemView.extend({
+            tagName:  'div',
+            render: function (){
+                this.$el.html('The area of the square is ' + this.model.getArea());
+                return this;
+            }
+        }));
+    },
+    teardown: function (){
+    }
+});
+
+test("test trigger reset", function() {
+        /*
+        add 3 objects to the collection
+        */
+
+        this.shapesCollection.add([this.square, this.circle]);
+
+    // trigger reset
 //    this.shapesView.render();
 //    ok(this.shapesCollection.at(0) instanceof this.Rectangle,'shape 1 is a rectangle');
 });
 
+test("test trigger add", function() {
+        this.shapesCollection.add([this.square, this.circle]);
+});
 
+test("test trigger remove", function() {
+        this.shapesCollection.add([this.square, this.circle]);
+});
 
 
