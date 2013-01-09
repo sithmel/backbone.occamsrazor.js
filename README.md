@@ -139,7 +139,9 @@ And then we add the views::
 You should notice that we use Backbone.Occamsrazor.ItemView as view constructor function. This is nearly identical to Backbone.View: the only difference is in the way the model is passed to the costructor.
 This emphasizes the fact that you must pass the model as argument and allows occamsrazor to pick the right view for a given model.
 
-If you want to add a new contructor extending Backbone.Occamsrazor.ItemView don't forget to call Backbone.Occamsrazor.ItemView.prototype.initialize.call(this, [options]);
+If you want to add a new contructor extending Backbone.Occamsrazor.ItemView don't forget to call first::
+
+    Backbone.Occamsrazor.ItemView.prototype.initialize.call(this, options, model);
 
 The same works even for a single model view::
 
