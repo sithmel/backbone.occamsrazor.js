@@ -1,3 +1,18 @@
+/******************************************************************************
+ *
+ * backbone.occamsrazor.js
+ * by Maurizio Lupo
+ *
+ * http://sithmel.blogspot.com
+ * @sithmel
+ * maurizio.lupo gmail com
+ *
+ * GPL license/MIT license
+ * 9 Jan 2013
+ *
+ * version 0.1
+ ******************************************************************************/
+
 /*
 This modules enhances Backbone.js using occamsrazor.js
 It allows to use heterogeneous and pluggable collections.
@@ -24,13 +39,16 @@ Backbone.Occamsrazor.ItemView
 
 A very simple view for rendering a model (passed in the constructor)
 
-remember to call Backbone.View.prototype.initialize.call(this, [options])
+don't forget to call Backbone.Occamsrazor.ItemView.prototype.initialize.call(this, [options])
 if you override the initialize
 */
 
 Backbone.Occamsrazor.ItemView = Backbone.View.extend({
     initialize : function (options, model){
         this.model = model;
+        if(! this.model){
+            throw new Error('Passing the model in the view is mandatory');
+        }
     }
 });
 
@@ -90,7 +108,7 @@ Backbone.Occamsrazor.CollectionView = Backbone.View.extend({
         this.addToView(view, index);
         
     },
-    removeChildView: function (item){
+    removeChildView: function (item, collection, options){
         this.children[item.cid].remove();
         delete this.children[item.cid];
     },

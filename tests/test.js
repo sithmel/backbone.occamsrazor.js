@@ -277,13 +277,6 @@ module("Heterogeneous collection view", {
 
 
         /*
-        add 3 objects to the collection
-        */
-
-//        this.shapesCollection.add([this.rect, this.square, this.circle]);
-
-
-        /*
         collection view
         */
 
@@ -315,23 +308,22 @@ module("Heterogeneous collection view", {
 });
 
 test("test trigger reset", function() {
-        /*
-        add 3 objects to the collection
-        */
-
-        this.shapesCollection.add([this.square, this.circle]);
-
-    // trigger reset
-//    this.shapesView.render();
-//    ok(this.shapesCollection.at(0) instanceof this.Rectangle,'shape 1 is a rectangle');
+    this.shapesCollection.reset([this.square, this.circle]);
+    equals($('#fixture').html(), '<div>The area of the square is 100</div><div>The area of the circle is 28</div>', 'it is the right view')
 });
 
 test("test trigger add", function() {
-        this.shapesCollection.add([this.square, this.circle]);
+    this.shapesCollection.add([this.square]);
+    equals($('#fixture').html(), '<div>The area of the square is 100</div>', 'it is the right view')
+    this.shapesCollection.add([this.circle]);
+    equals($('#fixture').html(), '<div>The area of the square is 100</div><div>The area of the circle is 28</div>', 'it is the right view')
 });
 
 test("test trigger remove", function() {
-        this.shapesCollection.add([this.square, this.circle]);
+    this.shapesCollection.reset([this.square, this.circle]);
+    var m = this.shapesCollection.at(1);
+    this.shapesCollection.remove(m);
+    equals($('#fixture').html(), '<div>The area of the square is 100</div>', 'it is the right view')
 });
 
 
