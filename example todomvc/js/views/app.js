@@ -91,22 +91,22 @@ $(function( $ ) {
 		},
 
 		// Generate the attributes for a new Todo item.
-		newAttributes: function() {
-			return {
-				title: this.input.val().trim(),
-				order: app.Todos.nextOrder(),
-				completed: false
-			};
-		},
+		newAttributes: occamsrazor(),
+
 
 		// If you hit return in the main input field, create new **Todo** model,
 		// persisting it to *localStorage*.
 		createOnEnter: function( e ) {
+		    var i, s, objs;
 			if ( e.which !== ENTER_KEY || !this.input.val().trim() ) {
 				return;
 			}
+			s = this.input.val().trim();
 
-			app.Todos.create( this.newAttributes() );
+			this.newAttributes(s, function (obj){
+                app.Todos.create(obj);
+            });
+
 			this.input.val('');
 		},
 

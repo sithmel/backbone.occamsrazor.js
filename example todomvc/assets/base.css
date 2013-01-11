@@ -394,6 +394,23 @@ label[for='toggle-all'] {
 	color: inherit;
 }
 
+.tweet img{
+    float: left;
+    margin-left: 48px;
+    margin-right: 10px;
+}
+.tweet label{
+    font-size: 56%;
+    padding: 5px !important;
+}
+.tweet h5{
+    padding-top: 0px;
+    margin: 3px;
+}
+.tweet h5 a{
+    text-decoration:none;
+    color: #777;    
+}
 /*
 	Hack to remove background from Mobile Safari.
 	Can't use it globally since it destroys checkboxes in Firefox and Opera
